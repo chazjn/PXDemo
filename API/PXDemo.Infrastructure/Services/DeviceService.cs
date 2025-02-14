@@ -4,13 +4,13 @@ using PXDemo.Infrastructure.Persistance;
 
 namespace PXDemo.Infrastructure.Services
 {
-    public class DeviceService(IDbContextFactory<DataContext> dbContextFactory) : IDeviceService
+    public class DeviceService(IDbContextFactory<DeviceDbContext> dbContextFactory) : IDeviceService
     {
-        readonly DataContext _dataContext = dbContextFactory.CreateDbContext();
+        readonly DeviceDbContext _deviceDbContext = dbContextFactory.CreateDbContext();
 
         public Device? GetDeviceById(Guid id)
         {
-            var device = _dataContext.Devices
+            var device = _deviceDbContext.Devices
                 .FirstOrDefault(d => d.Id == id);
 
             return device;
@@ -18,13 +18,13 @@ namespace PXDemo.Infrastructure.Services
 
         public IEnumerable<Device> GetDevices()
         {
-            return [.. _dataContext.Devices];
+            return [.. _deviceDbContext.Devices];
         }
 
         public void AddDevice(Device device) 
         { 
-            _dataContext.Devices.Add(device);
-            _dataContext.SaveChanges();
+            _deviceDbContext.Devices.Add(device);
+            _deviceDbContext.SaveChanges();
         }
     }
 }

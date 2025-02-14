@@ -4,13 +4,12 @@ using PXDemo.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddPooledDbContextFactory<DataContext>((sp, options) =>
+builder.Services.AddPooledDbContextFactory<DeviceDbContext>((serviceProvider, options) =>
 {
     options.UseInMemoryDatabase("InMemoryDb");
 });
