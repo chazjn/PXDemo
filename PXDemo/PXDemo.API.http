@@ -1,0 +1,6 @@
+@PXDemo.API_HostAddress = http://localhost:5146
+
+GET {{PXDemo.API_HostAddress}}/devices/
+Accept: application/json
+
+###
