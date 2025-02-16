@@ -1,4 +1,4 @@
-﻿namespace PXDemo.Infrastructure.Services
+﻿namespace PXDemo.Infrastructure.Features.DateTimeResolver
 {
     public interface IDateTimeResolver
     {

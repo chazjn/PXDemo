@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PXDemo.Infrastructure.Dtos;
+using PXDemo.Infrastructure.Features.DateTimeResolver;
+using PXDemo.Infrastructure.Features.Ordering;
 using PXDemo.Infrastructure.Models;
 using PXDemo.Infrastructure.Persistance;
 
@@ -7,7 +9,8 @@ namespace PXDemo.Infrastructure.Services
 {
     public class DeviceService(
         IDbContextFactory<DeviceDbContext> dbContextFactory,
-        IDateTimeResolver dateTimeResolver
+        IDateTimeResolver dateTimeResolver,
+        IOrderStrategy<Device> deviceOrderStrategy
         ) : IDeviceService
     {
         readonly DeviceDbContext _deviceDbContext = dbContextFactory.CreateDbContext();
@@ -24,8 +27,10 @@ namespace PXDemo.Infrastructure.Services
         {
             var devices = _deviceDbContext.Devices
                 .Include(d => d.DeviceType);
-            
-            return [.. devices];
+
+            var orderedDevices = deviceOrderStrategy.Order(devices);
+
+            return [.. orderedDevices];
         }
 
         public void AddDevice(DeviceInputDto deviceInput) 
@@ -58,6 +63,6 @@ namespace PXDemo.Infrastructure.Services
         }
 
         public IEnumerable<DeviceType> GetDeviceTypes()
-            => [.. _deviceDbContext.DeviceTypes];
+            => [.. _deviceDbContext.DeviceTypes.OrderBy(d => d.Name)];
     }
 }

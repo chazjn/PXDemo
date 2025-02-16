@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using PXDemo.Infrastructure.Features.DateTimeResolver;
+using PXDemo.Infrastructure.Features.Ordering;
 using PXDemo.Infrastructure.Models;
 using PXDemo.Infrastructure.Persistance;
 using PXDemo.Infrastructure.Services;
@@ -24,6 +26,11 @@ builder.Services.AddPooledDbContextFactory<DeviceDbContext>((serviceProvider, op
 
 builder.Services.AddTransient<IDateTimeResolver, UtcDateTimeResolver>();
 builder.Services.AddTransient<IDeviceService, DeviceService>();
+builder.Services.AddTransient<IOrderStrategy<Device>>(serviceProvider =>
+{
+    var dateTimeResolver = serviceProvider.GetService<IDateTimeResolver>();
+    return new DeviceOrderBySignalStrengthAndLastCommunication(dateTimeResolver, TimeSpan.FromMinutes(5));
+});
 
 var app = builder.Build();
 
