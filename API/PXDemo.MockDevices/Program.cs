@@ -81,12 +81,12 @@ double GetSignalStrength(double currentSignalStrength)
 static async Task<string?> ReadLineWithTimeout(int timeoutSeconds)
 {
     // Task to read user input asynchronously
-    Task<string?> inputTask = Task.Run(() => Console.ReadLine());
+    var inputTask = Task.Run(Console.ReadLine);
 
     // Task to handle the timeout
-    Task timeoutTask = Task.Delay(TimeSpan.FromSeconds(timeoutSeconds));
+    var timeoutTask = Task.Delay(TimeSpan.FromSeconds(timeoutSeconds));
 
-    // Wait for the first task to finish (input or timeout)
+    // Wait for the first task to finish
     var completedTask = await Task.WhenAny(inputTask, timeoutTask);
 
     // Always wait for the full timeout duration
@@ -94,10 +94,7 @@ static async Task<string?> ReadLineWithTimeout(int timeoutSeconds)
 
     // If the input task completes successfully before the timeout, return the result
     if (completedTask == inputTask && inputTask.IsCompletedSuccessfully)
-    {
         return inputTask.Result;
-    }
-
-    // Timeout occurred, return null
+    
     return null;
 }

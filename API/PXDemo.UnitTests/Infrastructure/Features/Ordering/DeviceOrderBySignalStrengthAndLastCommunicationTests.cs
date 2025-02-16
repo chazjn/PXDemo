@@ -14,7 +14,7 @@ namespace PXDemo.UnitTests.Infrastructure.Features.Ordering
             var dateTimeResolver = new Mock<IDateTimeResolver>();
             dateTimeResolver.Setup(s => s.Now).Returns(DateTime.Parse("2010-01-01 10:00"));
 
-            var orderer = new DeviceOrderBySignalStrengthAndLastCommunication(dateTimeResolver.Object, TimeSpan.FromMinutes(2));
+            var orderer = new DeviceOrderByStatusLastCommunicationAndSignalStrength(dateTimeResolver.Object, TimeSpan.FromMinutes(2));
 
             var items = new List<Device>
             {
