@@ -14,7 +14,7 @@
             <td>{{ device.name }}</td>
             <td>{{ device.deviceType?.name }}</td>
             <td>{{ device.isOnline ? 'Yes' : 'No' }}</td>
-            <td>{{ device.lastCommunication | date: 'short' }}</td>
+            <td>{{ device.lastCommunication | timeSince }}</td>
             <td>{{ device.signalStrength }}</td>
         </tr>
     </tbody>
