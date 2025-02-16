@@ -13,8 +13,8 @@ namespace PXDemo.Infrastructure.Features.Ordering
             var now = dateTimeResolver.Now;
 
             return items
-                .OrderByDescending(d => d.SignalStrength)
-                .ThenBy(d => now - d.LastCommunication > penaltyThreshold ? 100 : 0)
+                .OrderByDescending(d => now - d.LastCommunication > penaltyThreshold ? 0 : 1)
+                .ThenByDescending(d => d.SignalStrength)
                 .ThenBy(d => d.LastCommunication);
         }
     }

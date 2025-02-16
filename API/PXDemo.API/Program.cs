@@ -29,7 +29,7 @@ builder.Services.AddTransient<IDeviceService, DeviceService>();
 builder.Services.AddTransient<IOrderStrategy<Device>>(serviceProvider =>
 {
     var dateTimeResolver = serviceProvider.GetService<IDateTimeResolver>();
-    return new DeviceOrderBySignalStrengthAndLastCommunication(dateTimeResolver, TimeSpan.FromMinutes(3));
+    return new DeviceOrderBySignalStrengthAndLastCommunication(dateTimeResolver, TimeSpan.FromMinutes(2));
 });
 
 var app = builder.Build();
