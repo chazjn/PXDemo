@@ -46,7 +46,7 @@ builder.Services.AddQuartz(q =>
         .ForJob(jobKey)
         .WithIdentity($"{jobKey.Name}-trigger")
         .StartNow()
-        .WithCronSchedule("0 0/2 * * * ?",
+        .WithCronSchedule("0 0/1 * * * ?",
                cronBuilder => cronBuilder.WithMisfireHandlingInstructionDoNothing()));
 });
 

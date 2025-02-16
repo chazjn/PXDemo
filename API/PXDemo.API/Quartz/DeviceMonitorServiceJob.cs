@@ -9,7 +9,7 @@ namespace PXDemo.API.Quartz
         public Task Execute(IJobExecutionContext context)
         {
             //TODO: inject TimeSpan via config
-            deviceMonitorService.ProcessOnlineStatus(TimeSpan.FromMinutes(5));
+            deviceMonitorService.ProcessOnlineStatus(TimeSpan.FromMinutes(2));
             return Task.CompletedTask;
         }
     }

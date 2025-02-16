@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using PXDemo.Infrastructure.Dtos;
 using PXDemo.Infrastructure.Models;
+using System.Diagnostics;
 using System.Text;
 
 var rootUrl = "https://localhost:7124/api";
@@ -15,12 +16,13 @@ var pollingIntervalInput = Console.ReadLine();
 pollingInterval = string.IsNullOrWhiteSpace(pollingIntervalInput) ? pollingInterval : Convert.ToInt32(pollingIntervalInput);
 
 var faker = new Faker();
-var skippedDeviceIds = new List<Guid>();
+var pausedDeviceId = new List<Guid>();
 using var client = new HttpClient();
 while (true)
 {
 	try
 	{
+        Console.WriteLine();
         var devicesResponse = await client.GetStringAsync($"{rootUrl}/devices/");
         var devices = JsonConvert.DeserializeObject<IEnumerable<Device>>(devicesResponse);
 
@@ -30,9 +32,17 @@ while (true)
         foreach (var device in devices)
         {
             Console.Write($"{device.Id} {device.Name}: ");
-            if(skippedDeviceIds.Contains(device.Id))
+            if(pausedDeviceId.Contains(device.Id))
             {
-                Console.WriteLine("skipped");
+                Console.WriteLine("PAUSED");
+                continue;
+            }
+
+            //50% chance of signal update
+            var update = faker.Random.Number() > 0.5;
+            if(update == false)
+            {
+                Console.WriteLine("SKIPPED");
                 continue;
             }
 
@@ -56,13 +66,27 @@ while (true)
         Console.ReadKey();
     }
 
-    Console.WriteLine($"waiting {pollingInterval} seconds, enter an Id to add/remove from skip list");
-    var input = await ReadLineWithTimeout(pollingInterval);
-    if(Guid.TryParse(input, out Guid result))
+    Console.WriteLine();
+    Console.WriteLine($"waiting {pollingInterval} seconds, enter Ids to add/remove from pause list");
+
+    var stopWatch = new Stopwatch();
+    stopWatch.Start();
+
+    while(stopWatch.Elapsed.TotalSeconds < pollingInterval)
     {
-        if (!skippedDeviceIds.Remove(result))
-            skippedDeviceIds.Add(result);
+        if (Console.KeyAvailable)
+        {
+            var input = Console.ReadLine();
+            if (Guid.TryParse(input, out Guid result))
+            {
+                if (!pausedDeviceId.Remove(result))
+                    pausedDeviceId.Add(result);
+            }
+        }
+
+        Thread.Sleep(100);
     }
+    stopWatch.Stop();
 }
 
 double GetSignalStrength(double currentSignalStrength)
@@ -76,25 +100,4 @@ double GetSignalStrength(double currentSignalStrength)
         100);
 
     return Math.Round(updatedSignalStrength, 3);
-}
-
-static async Task<string?> ReadLineWithTimeout(int timeoutSeconds)
-{
-    // Task to read user input asynchronously
-    var inputTask = Task.Run(Console.ReadLine);
-
-    // Task to handle the timeout
-    var timeoutTask = Task.Delay(TimeSpan.FromSeconds(timeoutSeconds));
-
-    // Wait for the first task to finish
-    var completedTask = await Task.WhenAny(inputTask, timeoutTask);
-
-    // Always wait for the full timeout duration
-    await timeoutTask;
-
-    // If the input task completes successfully before the timeout, return the result
-    if (completedTask == inputTask && inputTask.IsCompletedSuccessfully)
-        return inputTask.Result;
-    
-    return null;
 }
