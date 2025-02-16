@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using PXDemo.API.Quartz;
 using PXDemo.Infrastructure.Features.DateTimeResolver;
 using PXDemo.Infrastructure.Features.Ordering;
 using PXDemo.Infrastructure.Models;
 using PXDemo.Infrastructure.Persistance;
 using PXDemo.Infrastructure.Services;
+using Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,11 +28,29 @@ builder.Services.AddPooledDbContextFactory<DeviceDbContext>((serviceProvider, op
 
 builder.Services.AddTransient<IDateTimeResolver, UtcDateTimeResolver>();
 builder.Services.AddTransient<IDeviceService, DeviceService>();
+builder.Services.AddTransient<IDeviceMonitorService, DeviceMonitorService>();
+
 builder.Services.AddTransient<IOrderStrategy<Device>>(serviceProvider =>
 {
     var dateTimeResolver = serviceProvider.GetService<IDateTimeResolver>();
     return new DeviceOrderByStatusLastCommunicationAndSignalStrength(dateTimeResolver, TimeSpan.FromMinutes(2));
 });
+
+builder.Services.AddQuartz(q =>
+{
+    var jobKey = new JobKey(nameof(DeviceMonitorServiceJob));
+
+    q.AddJob<DeviceMonitorServiceJob>(opts => opts.WithIdentity(jobKey));
+
+    q.AddTrigger(opts => opts
+        .ForJob(jobKey)
+        .WithIdentity($"{jobKey.Name}-trigger")
+        .StartNow()
+        .WithCronSchedule("0 0/2 * * * ?",
+               cronBuilder => cronBuilder.WithMisfireHandlingInstructionDoNothing()));
+});
+
+builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
 var app = builder.Build();
 
