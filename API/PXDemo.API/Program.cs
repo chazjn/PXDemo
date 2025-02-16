@@ -29,7 +29,7 @@ builder.Services.AddTransient<IDeviceService, DeviceService>();
 builder.Services.AddTransient<IOrderStrategy<Device>>(serviceProvider =>
 {
     var dateTimeResolver = serviceProvider.GetService<IDateTimeResolver>();
-    return new DeviceOrderBySignalStrengthAndLastCommunication(dateTimeResolver, TimeSpan.FromMinutes(5));
+    return new DeviceOrderBySignalStrengthAndLastCommunication(dateTimeResolver, TimeSpan.FromMinutes(3));
 });
 
 var app = builder.Build();
@@ -51,8 +51,13 @@ if(context.Database.IsInMemory())
         );
 
     context.Devices.AddRange(
-        new Device { Id = Guid.NewGuid(), Name = "Test Device 1", DeviceTypeId = 1 },
-        new Device { Id = Guid.NewGuid(), Name = "Test Device 2", DeviceTypeId = 2 }
+        new Device { Id = Guid.NewGuid(), Name = "Front Doorbell", DeviceTypeId = 1 },
+        new Device { Id = Guid.NewGuid(), Name = "Upstairs Door", DeviceTypeId = 2 },
+        new Device { Id = Guid.NewGuid(), Name = "Basement Door", DeviceTypeId = 3 },
+        new Device { Id = Guid.NewGuid(), Name = "Outside CCTV", DeviceTypeId = 4 },
+        new Device { Id = Guid.NewGuid(), Name = "Inside CCTV", DeviceTypeId = 4 },
+        new Device { Id = Guid.NewGuid(), Name = "East Hallway", DeviceTypeId = 5 },
+        new Device { Id = Guid.NewGuid(), Name = "West Hallway", DeviceTypeId = 5 }
         );
 
     context.SaveChanges();
