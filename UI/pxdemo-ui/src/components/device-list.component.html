@@ -1,0 +1,21 @@
+<!-- device-list.component.html -->
+<table border="1" cellpadding="5" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Device Type</th>
+            <th>Online</th>
+            <th>Last Communication</th>
+            <th>Signal Strength</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let device of devices">
+            <td>{{ device.name }}</td>
+            <td>{{ device.deviceType?.name }}</td>
+            <td>{{ device.isOnline ? 'Yes' : 'No' }}</td>
+            <td>{{ device.lastCommunication | date: 'short' }}</td>
+            <td>{{ device.signalStrength }}</td>
+        </tr>
+    </tbody>
+</table>
