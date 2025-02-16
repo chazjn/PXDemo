@@ -8,6 +8,7 @@ namespace PXDemo.Infrastructure.Services
         Device? GetDeviceById(Guid id);
         IEnumerable<Device> GetDevices();
         void AddDevice(DeviceInputDto device);
+        void UpdateDevice(Guid deviceId, DeviceUpdateDto deviceUpdate);
         IEnumerable<DeviceType> GetDeviceTypes();
     }
 }

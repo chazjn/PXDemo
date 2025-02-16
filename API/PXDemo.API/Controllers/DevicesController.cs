@@ -36,5 +36,11 @@ namespace PXDemo.API.Controllers
         {
             deviceService.AddDevice(deviceInput);
         }
+
+        [HttpPatch]
+        public void Patch(Guid id, [FromBody]DeviceUpdateDto deviceUpdate)
+        {
+            deviceService.UpdateDevice(id, deviceUpdate);
+        }
     }
 }

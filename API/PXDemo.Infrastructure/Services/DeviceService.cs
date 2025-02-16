@@ -44,16 +44,16 @@ namespace PXDemo.Infrastructure.Services
             _deviceDbContext.SaveChanges();
         }
 
-        public void UpdateSignalStrength(Guid deviceId, double signalStrength)
+        public void UpdateDevice(Guid deviceId, DeviceUpdateDto deviceUpdate)
         {
             var device = _deviceDbContext.Devices.FirstOrDefault(d => d.Id == deviceId);
             if (device == null)
                 return;
 
-            device.SignalStrength = signalStrength;
-            device.IsOnline = true;
             device.LastCommunication = dateTimeResolver.Now;
-            
+            device.SignalStrength = deviceUpdate.SignalStrength;
+            device.IsOnline = true;
+
             _deviceDbContext.SaveChanges();
         }
 
