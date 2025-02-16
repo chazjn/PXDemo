@@ -31,7 +31,7 @@ while (true)
             var updatedSignalStrength = Math.Clamp(
                 device.SignalStrength == 0
                     ? faker.Random.Number(0, 100) * faker.Random.Double()
-                    : device.SignalStrength + (faker.Random.Number(-5, 5) * faker.Random.Double()),
+                    : device.SignalStrength + (faker.Random.Number(-10, 10) * faker.Random.Double()),
                 0,
                 100);
 
