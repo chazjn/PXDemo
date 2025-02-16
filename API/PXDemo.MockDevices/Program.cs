@@ -15,6 +15,7 @@ var pollingIntervalInput = Console.ReadLine();
 pollingInterval = string.IsNullOrWhiteSpace(pollingIntervalInput) ? pollingInterval : Convert.ToInt32(pollingIntervalInput);
 
 var faker = new Faker();
+var skippedDeviceIds = new List<Guid>();
 using var client = new HttpClient();
 while (true)
 {
@@ -28,19 +29,19 @@ while (true)
 
         foreach (var device in devices)
         {
-            var updatedSignalStrength = Math.Clamp(
-                device.SignalStrength == 0
-                    ? faker.Random.Number(0, 100) * faker.Random.Double()
-                    : device.SignalStrength + (faker.Random.Number(-10, 10) * faker.Random.Double()),
-                0,
-                100);
+            Console.Write($"{device.Id} {device.Name}: ");
+            if(skippedDeviceIds.Contains(device.Id))
+            {
+                Console.WriteLine("skipped");
+                continue;
+            }
 
             var deviceUpdateDto = new DeviceUpdateDto
             {
-                SignalStrength = updatedSignalStrength
+                SignalStrength = GetSignalStrength(device.SignalStrength)
             };
 
-            Console.WriteLine($"Updating {device.Name}: {updatedSignalStrength}");
+            Console.WriteLine(deviceUpdateDto.SignalStrength);
 
             var json = JsonConvert.SerializeObject(deviceUpdateDto);
             var stringContent = new StringContent(json, Encoding.UTF8, "application/json");
@@ -55,6 +56,48 @@ while (true)
         Console.ReadKey();
     }
 
-    Console.WriteLine($"waiting {pollingInterval} seconds....");
-    Thread.Sleep(pollingInterval * 1000);
+    Console.WriteLine($"waiting {pollingInterval} seconds, enter an Id to add/remove from skip list");
+    var input = await ReadLineWithTimeout(pollingInterval);
+    if(Guid.TryParse(input, out Guid result))
+    {
+        if (!skippedDeviceIds.Remove(result))
+            skippedDeviceIds.Add(result);
+    }
+}
+
+double GetSignalStrength(double currentSignalStrength)
+{
+    //unless signal strength is zero it will be determined by previous value
+    var updatedSignalStrength = Math.Clamp(
+        currentSignalStrength == 0
+            ? faker.Random.Number(0, 100) * faker.Random.Double()
+            : currentSignalStrength + (faker.Random.Number(-10, 10) * faker.Random.Double()),
+        0,
+        100);
+
+    return Math.Round(updatedSignalStrength, 3);
+}
+
+static async Task<string?> ReadLineWithTimeout(int timeoutSeconds)
+{
+    // Task to read user input asynchronously
+    Task<string?> inputTask = Task.Run(() => Console.ReadLine());
+
+    // Task to handle the timeout
+    Task timeoutTask = Task.Delay(TimeSpan.FromSeconds(timeoutSeconds));
+
+    // Wait for the first task to finish (input or timeout)
+    var completedTask = await Task.WhenAny(inputTask, timeoutTask);
+
+    // Always wait for the full timeout duration
+    await timeoutTask;
+
+    // If the input task completes successfully before the timeout, return the result
+    if (completedTask == inputTask && inputTask.IsCompletedSuccessfully)
+    {
+        return inputTask.Result;
+    }
+
+    // Timeout occurred, return null
+    return null;
 }
