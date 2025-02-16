@@ -1,4 +1,5 @@
-﻿using PXDemo.Infrastructure.Models;
+﻿using PXDemo.Infrastructure.Dtos;
+using PXDemo.Infrastructure.Models;
 
 namespace PXDemo.Infrastructure.Services
 {
@@ -6,6 +7,7 @@ namespace PXDemo.Infrastructure.Services
     {
         Device? GetDeviceById(Guid id);
         IEnumerable<Device> GetDevices();
-        void AddDevice(Device device);
+        void AddDevice(DeviceInputDto device);
+        IEnumerable<DeviceType> GetDeviceTypes();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PXDemo.Infrastructure.Dtos;
 using PXDemo.Infrastructure.Models;
 using PXDemo.Infrastructure.Services;
 
@@ -8,12 +9,10 @@ namespace PXDemo.API.Controllers
     [Route("api/[controller]")]
     public class DevicesController(IDeviceService deviceService) : ControllerBase
     {
-        readonly IDeviceService _deviceService = deviceService;
-
         [HttpGet]
         public ActionResult<IEnumerable<Device>> Get() 
         {
-            var devices = _deviceService.GetDevices();
+            var devices = deviceService.GetDevices();
 
             if (devices == null || devices.Any() == false)
                 return Ok(new List<Device>());
@@ -24,7 +23,7 @@ namespace PXDemo.API.Controllers
         [HttpGet("{id}")]
         public ActionResult<Device> Get(Guid id) 
         {
-            var device = _deviceService.GetDeviceById(id);
+            var device = deviceService.GetDeviceById(id);
 
             if (device == null)
                 return NotFound();
@@ -33,9 +32,9 @@ namespace PXDemo.API.Controllers
         }
 
         [HttpPost]
-        public void Post(Device device) 
+        public void Post(DeviceInputDto deviceInput) 
         {
-            _deviceService.AddDevice(device);
+            deviceService.AddDevice(deviceInput);
         }
     }
 }
