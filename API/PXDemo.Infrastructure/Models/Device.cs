@@ -14,6 +14,6 @@
         
         public DateTime? LastCommunication { get; set; }
         
-        public double? SignalStrength { get; set; }
+        public double SignalStrength { get; set; }
     }
 }

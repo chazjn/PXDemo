@@ -37,7 +37,7 @@ namespace PXDemo.Infrastructure.Services
                 DeviceTypeId = deviceInput.DeviceTypeId,
                 IsOnline = false,
                 LastCommunication = null,
-                SignalStrength = null
+                SignalStrength = 0
             };
             
             _deviceDbContext.Devices.Add(device);
