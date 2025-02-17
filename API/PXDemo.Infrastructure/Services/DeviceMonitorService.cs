@@ -14,15 +14,12 @@ namespace PXDemo.Infrastructure.Services
         public void ProcessOnlineStatus(TimeSpan lastCommunicationThreshold)
         {
             var devices = _deviceDbContext.Devices
+                .Where(d => dateTimeResolver.Now - d.LastCommunication > lastCommunicationThreshold)
                 .Where(d => d.IsOnline);
 
-            var now = dateTimeResolver.Now;
             foreach (var device in devices)
-            {
-                if (now - device.LastCommunication > lastCommunicationThreshold)
                     device.IsOnline = false;
-            }
-
+            
             _deviceDbContext.SaveChanges();
         }
     }
